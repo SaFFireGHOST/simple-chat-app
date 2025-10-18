@@ -13,7 +13,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   const [showButton, setShowButton] = useState(false);
   const [showFireworks, setShowFireworks] = useState(false);
 
-  const fullText = `Hi ${user?.username}...\nThank you for accepting the invite\nI'm really glad you're here.`;
+  const fullText = `Hii ${user?.display_name}👋\nThank you for accepting the invite\nI'm really glad you're here.`;
 
   useEffect(() => {
     let currentIndex = 0;

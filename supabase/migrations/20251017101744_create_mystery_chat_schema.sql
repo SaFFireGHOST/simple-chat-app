@@ -62,6 +62,6 @@ CREATE POLICY "Users can insert their own messages"
 
 -- Insert initial users (using simple password for demo - in production, use proper hashing)
 INSERT INTO chat_users (username, display_name, password_hash) VALUES
-  ('user1', 'user1', 'pass1'),
-  ('user2', 'user2', 'pass2')
+  ('SaFFireGHOST', 'Mr.Mystery', 'koushik'),
+  ('jiya', 'Jiya', 'jiya')
 ON CONFLICT (username) DO NOTHING;

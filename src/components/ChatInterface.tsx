@@ -15,12 +15,26 @@ export function ChatInterface() {
     loadMessages();
 
     const channel = supabase
-      .channel('messages')
+      .channel('public:messages')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+        async (payload) => {
+          const newMsg = payload.new as Message;
+
+          // Fetch sender's display_name
+          const { data: userData } = await supabase
+            .from('chat_users')
+            .select('display_name')
+            .eq('id', newMsg.sender_id)
+            .single();
+
+          const enrichedMessage = {
+            ...newMsg,
+            chat_users: userData ? { display_name: userData.display_name } : null,
+          };
+
+          setMessages((prev) => [...prev, enrichedMessage]);
           setIsTyping(false);
         }
       )
@@ -31,6 +45,8 @@ export function ChatInterface() {
     };
   }, []);
 
+
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -38,11 +54,11 @@ export function ChatInterface() {
   const loadMessages = async () => {
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select('*, chat_users ( display_name )') //getting the username
       .order('created_at', { ascending: true });
 
     if (data && !error) {
-      setMessages(data);
+      setMessages(data as any); // We cast to any for now
     }
   };
 
@@ -94,8 +110,8 @@ export function ChatInterface() {
               >
                 <div
                   className={`max-w-md px-6 py-3 rounded-2xl backdrop-blur-lg border transition-all duration-300 hover:scale-105 ${isOwnMessage(message.sender_id)
-                      ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-pink-400/30 text-white shadow-lg shadow-pink-500/20'
-                      : 'bg-gradient-to-r from-blue-500/20 to-violet-500/20 border-blue-400/30 text-white shadow-lg shadow-blue-500/20'
+                    ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-pink-400/30 text-white shadow-lg shadow-pink-500/20'
+                    : 'bg-gradient-to-r from-blue-500/20 to-violet-500/20 border-blue-400/30 text-white shadow-lg shadow-blue-500/20'
                     }`}
                   style={{
                     boxShadow: isOwnMessage(message.sender_id)
@@ -104,7 +120,7 @@ export function ChatInterface() {
                   }}
                 >
                   <p className="text-sm mb-1 opacity-70">
-                    {isOwnMessage(message.sender_id) ? 'user1' : 'user2'}
+                    {message.chat_users?.display_name || 'Unknown User'}
                   </p>
                   <p className="break-words">{message.content}</p>
                   <p className="text-xs opacity-50 mt-2">

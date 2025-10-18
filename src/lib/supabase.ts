@@ -18,4 +18,7 @@ export interface Message {
   sender_id: string;
   content: string;
   created_at: string;
+  chat_users: { // Add this part
+    display_name: string;
+  } | null;
 }
