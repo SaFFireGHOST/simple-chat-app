@@ -62,35 +62,35 @@ export function ChatInterface() {
   const pickerContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-  function handleClickOutside(event: MouseEvent) {
-    const pickerEl = pickerRef.current;
-    const buttonEl = emojiButtonRef.current;
+    function handleClickOutside(event: MouseEvent) {
+      const pickerEl = pickerRef.current;
+      const buttonEl = emojiButtonRef.current;
 
-    // Close if clicked outside both picker & button
-    if (
-      pickerEl &&
-      !pickerEl.contains(event.target as Node) &&
-      buttonEl &&
-      !buttonEl.contains(event.target as Node)
-    ) {
-      // ✅ Explicitly close if clicked in the message input too
-      const target = event.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        setShowPicker(false);
-      } else {
-        setShowPicker(false);
+      // Close if clicked outside both picker & button
+      if (
+        pickerEl &&
+        !pickerEl.contains(event.target as Node) &&
+        buttonEl &&
+        !buttonEl.contains(event.target as Node)
+      ) {
+        // ✅ Explicitly close if clicked in the message input too
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          setShowPicker(false);
+        } else {
+          setShowPicker(false);
+        }
       }
     }
-  }
 
-  if (showPicker) {
-    document.addEventListener('mousedown', handleClickOutside);
-  }
+    if (showPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
 
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, [showPicker]);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPicker]);
 
 
 
@@ -143,7 +143,7 @@ export function ChatInterface() {
         <div className="max-w-4xl w-full mx-auto flex flex-col" style={{ height: '85vh' }}>
           <div className="flex justify-between items-center backdrop-blur-xl bg-white/5 rounded-t-3xl p-6 border-t border-x border-white/10">
             <div>
-              <h1 className="text-3xl font-bold text-white tracking-wide">
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
                 Mystery Chat ✨💬
               </h1>
               <p className="text-pink-200 text-sm mt-1">
@@ -155,7 +155,7 @@ export function ChatInterface() {
               className="px-4 py-2 rounded-lg bg-red-500/20 border border-red-400/30 text-white font-semibold hover:bg-red-500/40 transition-all duration-300 flex items-center gap-2"
             >
               <LogOut size={18} />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
 
@@ -166,7 +166,7 @@ export function ChatInterface() {
                 className={`flex ${isOwnMessage(message.sender_id) ? 'justify-end' : 'justify-start'} animate-fade-in`}
               >
                 <div
-                  className={`max-w-md px-6 py-3 rounded-2xl backdrop-blur-lg border transition-all duration-300 hover:scale-105 ${isOwnMessage(message.sender_id)
+                  className={`max-w-xs md:max-w-md px-4 py-2 md:px-6 md:py-3 rounded-2xl backdrop-blur-lg border transition-all duration-300 hover:scale-105 ${isOwnMessage(message.sender_id)
                     ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-pink-400/30 text-white shadow-lg shadow-pink-500/20'
                     : 'bg-gradient-to-r from-blue-500/20 to-violet-500/20 border-blue-400/30 text-white shadow-lg shadow-blue-500/20'
                     }`}
@@ -210,31 +210,32 @@ export function ChatInterface() {
             )}
             <form
               onSubmit={sendMessage}
-              className="backdrop-blur-xl bg-white/5 rounded-b-3xl p-6 border-b border-x border-white/10"
+              className="backdrop-blur-xl bg-white/5 rounded-b-3xl p-2 sm:p-6 border-b border-x border-white/10 "
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   type="button"
                   ref={emojiButtonRef}
                   onClick={() => setShowPicker(val => !val)}
-                  className="p-3 rounded-full hover:bg-white/20 transition-colors"
+                  className="p-1.5 sm:p-3 rounded-full hover:bg-white/20 transition-colors ml-1 sm:ml-0"
                 >
-                  <Smile className="text-white/70" />
+                  <Smile className="text-white/70 sm:w-7 sm:h-7 w-5 h-5" size={24} />
+                  
                 </button>
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 px-6 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-transparent transition-all"
+                  className="flex-1 px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-transparent transition-all"
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
+                  className="px-3 py-2 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
                 >
-                  <Send size={20} />
-                  Send
+                  <Send size={20} className="sm:w-5 sm:h-5 w-4 h-4" />
+                  <span className="hidden sm:inline">Send</span>
                 </button>
               </div>
             </form>
