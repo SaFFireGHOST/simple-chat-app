@@ -70,10 +70,13 @@ export function Fireworks() {
     }
 
     const fireworkInterval = setInterval(() => {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * (canvas.height * 0.5);
-      createFirework(x, y);
-    }, 500);
+      for (let i = 0; i < 3; i++) { // spawn 3 at once
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * (canvas.height * 0.7);
+        createFirework(x, y);
+      }
+    }, 400);
+
 
     let animationId = requestAnimationFrame(animate);
 
