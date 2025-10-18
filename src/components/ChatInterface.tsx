@@ -204,8 +204,8 @@ export function ChatInterface() {
 
           <div className="relative" ref={pickerContainerRef}>
             {showPicker && (
-              <div className="absolute bottom-full mb-2" ref={pickerRef}>
-                <EmojiPicker onEmojiClick={onEmojiClick} />
+              <div className="absolute z-20 bottom-full mb-2 left-3 emoji-picker-container" ref={pickerRef}>
+                <EmojiPicker onEmojiClick={onEmojiClick} height="95%" width="95%" previewConfig={{ showPreview: false }} skinTonesDisabled={true} />
               </div>
             )}
             <form
@@ -220,7 +220,7 @@ export function ChatInterface() {
                   className="p-1.5 sm:p-3 rounded-full hover:bg-white/20 transition-colors ml-1 sm:ml-0"
                 >
                   <Smile className="text-white/70 sm:w-7 sm:h-7 w-5 h-5" size={24} />
-                  
+
                 </button>
                 <input
                   type="text"

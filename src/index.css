@@ -48,3 +48,20 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #a855f7 transparent;
 }
+
+/* === Responsive Emoji Picker Container === */
+
+/* Default size for desktop */
+.emoji-picker-container {
+  width: 300px;
+  height: 400px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Size for mobile screens (screens smaller than 640px) */
+@media (max-width: 640px) {
+  .emoji-picker-container {
+    width: 280px;
+    height: 400px;
+  }
+}
