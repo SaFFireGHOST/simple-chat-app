@@ -1,15 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Smile, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Message } from '../lib/supabase';
 import { Starfield } from './Starfield';
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react'; // Import EmojiPicker
 
 export function ChatInterface() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showPicker, setShowPicker] = useState(false); // State to manage picker visibility
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     loadMessages();
@@ -51,6 +56,44 @@ export function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+
+
+
+  const pickerContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    const pickerEl = pickerRef.current;
+    const buttonEl = emojiButtonRef.current;
+
+    // Close if clicked outside both picker & button
+    if (
+      pickerEl &&
+      !pickerEl.contains(event.target as Node) &&
+      buttonEl &&
+      !buttonEl.contains(event.target as Node)
+    ) {
+      // ✅ Explicitly close if clicked in the message input too
+      const target = event.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        setShowPicker(false);
+      } else {
+        setShowPicker(false);
+      }
+    }
+  }
+
+  if (showPicker) {
+    document.addEventListener('mousedown', handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [showPicker]);
+
+
+
   const loadMessages = async () => {
     const { data, error } = await supabase
       .from('messages')
@@ -84,6 +127,11 @@ export function ChatInterface() {
     }
   };
 
+  // Function to add the selected emoji to the input
+  const onEmojiClick = (emojiObject: EmojiClickData) => {
+    setNewMessage(prevInput => prevInput + emojiObject.emoji);
+  };
+
   const isOwnMessage = (senderId: string) => senderId === user?.id;
 
   return (
@@ -93,13 +141,22 @@ export function ChatInterface() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4 md:p-8">
         <div className="max-w-4xl w-full mx-auto flex flex-col" style={{ height: '85vh' }}>
-          <div className="backdrop-blur-xl bg-white/5 rounded-t-3xl p-6 border-t border-x border-white/10">
-            <h1 className="text-3xl font-bold text-white text-center tracking-wide">
-              Mystery Chat ✨💬
-            </h1>
-            <p className="text-pink-200 text-center text-sm mt-2">
-              Logged in as {user?.username}
-            </p>
+          <div className="flex justify-between items-center backdrop-blur-xl bg-white/5 rounded-t-3xl p-6 border-t border-x border-white/10">
+            <div>
+              <h1 className="text-3xl font-bold text-white tracking-wide">
+                Mystery Chat ✨💬
+              </h1>
+              <p className="text-pink-200 text-sm mt-1">
+                Logged in as {user?.username}
+              </p>
+            </div>
+            <button
+              onClick={logout}
+              className="px-4 py-2 rounded-lg bg-red-500/20 border border-red-400/30 text-white font-semibold hover:bg-red-500/40 transition-all duration-300 flex items-center gap-2"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
           </div>
 
           <div className="flex-1 backdrop-blur-xl bg-white/5 border-x border-white/10 overflow-y-auto p-6 space-y-4 chat-messages">
@@ -145,28 +202,43 @@ export function ChatInterface() {
             <div ref={messagesEndRef} />
           </div>
 
-          <form
-            onSubmit={sendMessage}
-            className="backdrop-blur-xl bg-white/5 rounded-b-3xl p-6 border-b border-x border-white/10"
-          >
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 px-6 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-transparent transition-all"
-              />
-              <button
-                type="submit"
-                disabled={!newMessage.trim()}
-                className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
-              >
-                <Send size={20} />
-                Send
-              </button>
-            </div>
-          </form>
+          <div className="relative" ref={pickerContainerRef}>
+            {showPicker && (
+              <div className="absolute bottom-full mb-2" ref={pickerRef}>
+                <EmojiPicker onEmojiClick={onEmojiClick} />
+              </div>
+            )}
+            <form
+              onSubmit={sendMessage}
+              className="backdrop-blur-xl bg-white/5 rounded-b-3xl p-6 border-b border-x border-white/10"
+            >
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  ref={emojiButtonRef}
+                  onClick={() => setShowPicker(val => !val)}
+                  className="p-3 rounded-full hover:bg-white/20 transition-colors"
+                >
+                  <Smile className="text-white/70" />
+                </button>
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  className="flex-1 px-6 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-transparent transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim()}
+                  className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:shadow-lg hover:shadow-pink-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
+                >
+                  <Send size={20} />
+                  Send
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
