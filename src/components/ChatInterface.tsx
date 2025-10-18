@@ -75,29 +75,28 @@ export function ChatInterface() {
       <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-purple-950 to-black" />
       <Starfield />
 
-      <div className="relative z-10 min-h-screen flex flex-col p-4 md:p-8">
-        <div className="max-w-4xl w-full mx-auto flex flex-col h-screen">
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 md:p-8">
+        <div className="max-w-4xl w-full mx-auto flex flex-col" style={{ height: '85vh' }}>
           <div className="backdrop-blur-xl bg-white/5 rounded-t-3xl p-6 border-t border-x border-white/10">
             <h1 className="text-3xl font-bold text-white text-center tracking-wide">
-              Mystery Chat 💬
+              Mystery Chat ✨💬
             </h1>
             <p className="text-pink-200 text-center text-sm mt-2">
               Logged in as {user?.username}
             </p>
           </div>
 
-          <div className="flex-1 backdrop-blur-xl bg-white/5 border-x border-white/10 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 backdrop-blur-xl bg-white/5 border-x border-white/10 overflow-y-auto p-6 space-y-4 chat-messages">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${isOwnMessage(message.sender_id) ? 'justify-end' : 'justify-start'} animate-fade-in`}
               >
                 <div
-                  className={`max-w-md px-6 py-3 rounded-2xl backdrop-blur-lg border transition-all duration-300 hover:scale-105 ${
-                    isOwnMessage(message.sender_id)
+                  className={`max-w-md px-6 py-3 rounded-2xl backdrop-blur-lg border transition-all duration-300 hover:scale-105 ${isOwnMessage(message.sender_id)
                       ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-pink-400/30 text-white shadow-lg shadow-pink-500/20'
                       : 'bg-gradient-to-r from-blue-500/20 to-violet-500/20 border-blue-400/30 text-white shadow-lg shadow-blue-500/20'
-                  }`}
+                    }`}
                   style={{
                     boxShadow: isOwnMessage(message.sender_id)
                       ? '0 0 20px rgba(236, 72, 153, 0.3)'
@@ -109,7 +108,7 @@ export function ChatInterface() {
                   </p>
                   <p className="break-words">{message.content}</p>
                   <p className="text-xs opacity-50 mt-2">
-                    {new Date(message.created_at).toLocaleTimeString()}
+                    {new Date(message.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                   </p>
                 </div>
               </div>
@@ -169,6 +168,8 @@ export function ChatInterface() {
         .animate-fade-in {
           animation: fadeIn 0.3s ease-in;
         }
+
+        
       `}</style>
     </div>
   );

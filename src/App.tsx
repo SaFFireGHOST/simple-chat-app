@@ -5,31 +5,36 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { ChatInterface } from './components/ChatInterface';
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
-  const [showChat, setShowChat] = useState(false);
 
   const handleLoginSuccess = () => {
+    // This is called after a fresh login, so we trigger the welcome screen.
     setShowWelcome(true);
   };
 
   const handleWelcomeComplete = () => {
-    setShowChat(true);
+    // After the welcome screen is done, we hide it to reveal the chat.
+    setShowWelcome(false);
   };
 
-  if (!user) {
-    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  // While checking for a stored user, don't render anything.
+  if (loading) {
+    return null; // Or you could return a loading spinner component here
   }
 
-  if (showWelcome && !showChat) {
-    return <WelcomeScreen onComplete={handleWelcomeComplete} />;
-  }
-
-  if (showChat) {
+  // If a user exists...
+  if (user) {
+    // ...and we need to show the welcome screen (because of a fresh login)...
+    if (showWelcome) {
+      return <WelcomeScreen onComplete={handleWelcomeComplete} />;
+    }
+    // ...otherwise, show the chat interface (for a restored session).
     return <ChatInterface />;
   }
 
-  return null;
+  // If there's no user, show the login page.
+  return <LoginPage onLoginSuccess={handleLoginSuccess} />;
 }
 
 function App() {
